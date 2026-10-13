@@ -1,0 +1,31 @@
+name: Deploy Sovereign AI Studio
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Vault
+        uses: actions/checkout@v4
+
+      - name: Initialize Node Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Compile Studio Canvas
+        run: |
+          npm ci
+          npm run setup
+          npm run build
+
+      - name: Distribute to Cloudflare Edge
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: open-gen-ai-vault
+          directory: app/out
