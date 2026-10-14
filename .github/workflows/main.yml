@@ -4,23 +4,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Pages
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - name: Checkout Vault
         uses: actions/checkout@v4
 
-      - name: Force Static Output Target
-        run: |
-          mkdir -p build_output
-          cp -r * build_output/ 2>/dev/null || true
-          rm -rf build_output/build_output build_output/.github build_output/.git
-
-      - name: Distribute to Cloudflare Edge
+      - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: open-gen-ai-vault
-          directory: build_output
-          allowEmptyDirectory: true
+          command: pages deploy . --project-name=open-gen-ai-vault
