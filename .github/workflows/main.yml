@@ -19,13 +19,12 @@ jobs:
       - name: Compile Studio Canvas
         run: |
           npm ci
-          npm run setup
           npm run build
 
       - name: Distribute to Cloudflare Edge
-        uses: uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: open-gen-ai-vault
-          directory: app/out 
+          directory: dist
